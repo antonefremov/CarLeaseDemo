@@ -1,0 +1,34 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:f="sap.ui.layout.form">
+	<Dialog contentWidth="500px" afterOpen="getExistingOwners" title="{i18n>newVehicleDialogTitle}" class="sapUiSizeCompact">
+		<f:SimpleForm id="EmfFormMovementDetails" editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4"
+			labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="4" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="1" columnsM="1"
+			singleContainerFullSize="false">
+			<f:content>
+				<Label text="{i18n>v5cID}" labelFor="MakeTxt"/>
+				<Input id="v5cIDTxt" value="{newVehicleModel>/v5cID}"/>
+				<Label text="{i18n>Make}" labelFor="MakeTxt"/>
+				<Input id="MakeTxt" value="{newVehicleModel>/make}"/>
+				<Label text="{i18n>Model}" labelFor="ModelTxt"/>
+				<Input id="ModelTxt" value="{newVehicleModel>/model}"/>
+				<Label text="{i18n>Reg}" labelFor="RegTxt"/>
+				<Input id="RegTxt" value="{newVehicleModel>/reg}"/>
+				<Label text="{i18n>Colour}" labelFor="ColourTxt"/>
+				<Input id="ColourTxt" value="{newVehicleModel>/colour}"/>
+				<Label text="{i18n>OwnerId}" labelFor="OwnerIdSel"/>
+				<Select id="OwnerTypeSel" selectedKey="{newVehicleModel>/ownerId}" change="onOwnerSelected" showSecondaryValues= "true"
+					items="{
+						path: 'existingOwnersModel>/owners',
+						sorter: { path: 'id' }
+					}">
+					<core:ListItem key="{existingOwnersModel>id}" text="{existingOwnersModel>id}" additionalText="{existingOwnersModel>username}   {existingOwnersModel>company}"/>
+				</Select>
+			</f:content>
+		</f:SimpleForm>
+		<buttons>
+			<Button text="{i18n>btnOk}" type="Accept" press="onNewVehicleDialogOK" 
+				enabled="{= !!${newVehicleModel>/v5cID} &amp;&amp; !!${newVehicleModel>/make} &amp;&amp; !!${newVehicleModel>/model} &amp;&amp; !!${newVehicleModel>/reg} &amp;&amp; 
+				!!${newVehicleModel>/colour} &amp;&amp; !${newVehicleModel>/ownerId}.length !== 0}"/>
+			<Button text="{i18n>btnCancel}" press="onNewVehicleDialogCancel"/>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>

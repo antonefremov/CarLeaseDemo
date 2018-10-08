@@ -10,10 +10,13 @@
 						<headerToolbar>
 							<Toolbar>
 								<ToolbarSpacer/>
-								<Button text="{i18n>newVehicleBtnText}" press="onNewButtonPress"/>
+								<Button text="{i18n>newVehicleBtnText}" press="onNewVehicleBtnPress"/>
 							</Toolbar>
 						</headerToolbar>
 						<columns>
+							<Column id="v5cID">
+								<Text text="{i18n>v5cID}" id="v5cIDColumnTitle"/>
+							</Column>
 							<Column id="Make">
 								<Text text="{i18n>Make}" id="MakeColumnTitle"/>
 							</Column>
@@ -36,6 +39,7 @@
 						<items>
 							<ColumnListItem type="Inactive">
 								<cells>
+									<Text text="{v5cID}"/>
 									<Text text="{make}"/>
 									<Text text="{model}"/>
 									<Text text="{reg}"/>
