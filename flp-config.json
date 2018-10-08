@@ -1,0 +1,34 @@
+{
+    "application": {
+        "id": "",
+        "title": "car.lease.CarLeaseDemo.CarLeaseDemo",
+        "type": "SAP_UI5_Component",
+        "componentUrl": "/",
+        "appUrl": "#CarLeaseDemo-Display",
+        "navigationComponentName": "car.lease.CarLeaseDemo",
+        "intentSemanticObject": "CarLeaseDemo",
+        "intentAction": "Display",
+        "html5ApplicationName": "carleasedemo",
+        "HCPParentApplicationName": ""
+    },
+    "assignment": {
+        "groups": [
+            "00000000-0000-1111-0000-00000000"
+        ],
+        "contentPackages": [
+            "00000000-0000-2222-0000-00000000"
+        ],
+        "categories": []
+    },
+    "tile": {
+        "type": "StaticTile",
+        "title": "Lease Company",
+        "subtitle": "Manage Vehicles",
+        "searchKeywords": "Lease Company,Manage Vehicles",
+        "displayIconUrl": "sap-icon://begin",
+        "displayInfoText": "",
+        "size": "1x1",
+        "serviceURL": "",
+        "refreshInterval": ""
+    }
+}

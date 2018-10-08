@@ -1,0 +1,53 @@
+<mvc:View controllerName="car.lease.CarLeaseDemo.controller.View1" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc"
+	displayBlock="true" xmlns="sap.m">
+	<App id="idAppControl">
+		<pages>
+			<Page title="{i18n>title}">
+				<content>
+					<Table id="CarLeaseWorklistTable" width="auto" items="{ path: '/vehicles'}" noDataText="No data"
+						busyIndicatorDelay="1" growing="true" growingScrollToLoad="true" class="sapUiSizeCompact"
+						selectionChange="onDetailPress" mode="SingleSelectMaster">
+						<headerToolbar>
+							<Toolbar>
+								<ToolbarSpacer/>
+								<Button text="{i18n>newVehicleBtnText}" press="onNewButtonPress"/>
+							</Toolbar>
+						</headerToolbar>
+						<columns>
+							<Column id="Make">
+								<Text text="{i18n>Make}" id="MakeColumnTitle"/>
+							</Column>
+							<Column id="Model">
+								<Text text="{i18n>Model}" id="ModelColumnTitle"/>
+							</Column>
+							<Column id="Reg" minScreenWidth="Tablet" demandPopin="true">
+								<Text text="{i18n>Reg}" id="RegColumnTitle"/>
+							</Column>
+							<Column id="Colour" minScreenWidth="Tablet" demandPopin="true">
+								<Text text="{i18n>Colour}" id="ColourColumnTitle"/>
+							</Column>
+							<Column id="OwnerId" minScreenWidth="Tablet" demandPopin="true">
+								<Text text="{i18n>OwnerId}" id="OwnerIdColumnTitle"/>
+							</Column>
+							<Column id="OwnerName" minScreenWidth="Tablet" demandPopin="true">
+								<Text text="{i18n>OwnerName}" id="OwnerNameColumnTitle"/>
+							</Column>
+						</columns>
+						<items>
+							<ColumnListItem type="Inactive">
+								<cells>
+									<Text text="{make}"/>
+									<Text text="{model}"/>
+									<Text text="{reg}"/>
+									<Text text="{colour}"/>
+									<Text text="{owner/id}"/>
+									<Text text="{owner/username}"/>
+								</cells>
+							</ColumnListItem>
+						</items>
+					</Table>
+				</content>
+			</Page>
+		</pages>
+	</App>
+</mvc:View>
