@@ -1,6 +1,6 @@
 <core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:f="sap.ui.layout.form">
 	<Dialog contentWidth="500px" afterOpen="getExistingOwners" title="{i18n>newVehicleDialogTitle}" class="sapUiSizeCompact">
-		<f:SimpleForm id="EmfFormMovementDetails" editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4"
+		<f:SimpleForm id="EmfFormNewVehicle" editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4"
 			labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="4" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="1" columnsM="1"
 			singleContainerFullSize="false">
 			<f:content>
@@ -14,8 +14,8 @@
 				<Input id="RegTxt" value="{newVehicleModel>/reg}"/>
 				<Label text="{i18n>Colour}" labelFor="ColourTxt"/>
 				<Input id="ColourTxt" value="{newVehicleModel>/colour}"/>
-				<Label text="{i18n>OwnerId}" labelFor="OwnerIdSel"/>
-				<Select id="OwnerTypeSel" selectedKey="{newVehicleModel>/ownerId}" change="onOwnerSelected" showSecondaryValues= "true"
+				<Label text="{i18n>OwnerId}" labelFor="NewVehicleOwnerSel"/>
+				<Select id="NewVehicleOwnerSel" selectedKey="{newVehicleModel>/ownerId}" change="onOwnerSelected" showSecondaryValues="true"
 					items="{
 						path: 'existingOwnersModel>/owners',
 						sorter: { path: 'id' }

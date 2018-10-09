@@ -1,0 +1,24 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:f="sap.ui.layout.form">
+	<Dialog contentWidth="500px" afterOpen="getExistingOwners" title="{i18n>changeOwnerDialogTitle}" class="sapUiSizeCompact">
+		<f:SimpleForm id="EmfFormChangeOwner" editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4"
+			labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="4" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="1" columnsM="1"
+			singleContainerFullSize="false">
+			<f:content>
+				<Label text="{i18n>CurrentOwner}" labelFor="CurrentOwnerTxt"/>
+				<Text id="CurrentOwnerTxt" text="{selectedVehicleModel>/owner/id}     {selectedVehicleModel>/owner/username} - {selectedVehicleModel>/owner/company}"/>
+				<Label text="{i18n>NewOwnerId}" labelFor="ChangeOwnerSel"/>
+				<Select id="ChangeOwnerSel" change="onOwnerSelected" showSecondaryValues="true"
+					items="{
+						path: 'existingOwnersModel>/owners',
+						sorter: { path: 'id' }
+					}">
+					<core:ListItem key="{existingOwnersModel>id}" text="{existingOwnersModel>id}" additionalText="{existingOwnersModel>username} - {existingOwnersModel>company}"/>
+				</Select>
+			</f:content>
+		</f:SimpleForm>
+		<buttons>
+			<Button text="{i18n>btnUpdate}" type="Accept" press="onChangeVehicleOwnerDialogOK"/>
+			<Button text="{i18n>btnCancel}" press="onChangeVehicleOwnerDialogCancel"/>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>

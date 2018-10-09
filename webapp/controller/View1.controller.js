@@ -15,6 +15,7 @@ sap.ui.define([
 			"chaincodePath": "/chaincodes/627077c8-e9a6-4ffb-b368-01ef0c303dd5-com-sap-blockchain-carlease/latest/",
 			"vehiclesPath": "vehicles/",
 			"ownersPath": "owners/",
+			"vehicleOwnerPath": "vehicles/owner/v",
 			"oAuth": {
 				"clientId": "sb-34d0015d-0a99-496a-8fcd-e74ea546e694!b5485|na-420adfc9-f96e-4090-a650-0386988b67e0!b1836",
 				"clientSecret": "IUTA1zPBP0ZO2m7k75nqDvAIo6w=",
@@ -23,13 +24,15 @@ sap.ui.define([
 		},
 
 		onInit: function () {
-			var oNewVehicleModel = new JSONModel({});
-			var oExistingOwnersModel = new JSONModel({});
-			var oSelectedOwnerModel = new JSONModel({});
+			var oNewVehicleModel = new JSONModel({}),
+				oExistingOwnersModel = new JSONModel({}),
+				oSelectedNewOwnerModel = new JSONModel({}),
+				oSelectedVehicleModel = new JSONModel({}),
+				that = this;
 			this.getView().setModel(oNewVehicleModel, "newVehicleModel");
 			this.getView().setModel(oExistingOwnersModel, "existingOwnersModel");
-			this.getView().setModel(oSelectedOwnerModel, "selectedOwnerModel");
-			var that = this;
+			this.getView().setModel(oSelectedNewOwnerModel, "selectedNewOwnerModel");
+			this.getView().setModel(oSelectedVehicleModel, "selectedVehicleModel");
 			this.getToken(this.serviceKey.oAuth.url + "/oauth/token?grant_type=client_credentials",
 					this.serviceKey.oAuth.clientId,
 					this.serviceKey.oAuth.clientSecret)
@@ -77,7 +80,7 @@ sap.ui.define([
 				this._newVehicleDialog = sap.ui.xmlfragment(sFragId, "car.lease.CarLeaseDemo.fragments.NewVehicle", this);
 				this.getView().addDependent(this._newVehicleDialog);
 			}
-			this._newVehicleDialog.setModel(this.getView().getModel("DeferCodeModel"));
+			//this._newVehicleDialog.setModel(this.getView().getModel("DeferCodeModel"));
 			this._newVehicleDialog.open();
 		},
 
@@ -92,7 +95,7 @@ sap.ui.define([
 				data = oModel.getData(),
 				serviceUrl = this.serviceKey.serviceUrl + this.serviceKey.chaincodePath + this.serviceKey.vehiclesPath + data.v5cID,
 				xhr = new XMLHttpRequest(),
-				oSelectedOwnerModel = this.getView().getModel("selectedOwnerModel"),
+				oSelectedOwnerModel = this.getView().getModel("selectedNewOwnerModel"),
 				that = this;
 
 			var selectedOwnerData = oSelectedOwnerModel.getData();
@@ -172,12 +175,75 @@ sap.ui.define([
 			var oSelect = oEvent.getSource(),
 			sSelectedKey = oSelect.getSelectedKey();
 			
-			var oModel = this.getView().getModel("existingOwnersModel");
-			var aOwners = oModel.getData().owners;
+			var oModel = this.getView().getModel("existingOwnersModel"),
+				aOwners = oModel.getData().owners;
 			
-			var oOwner = aOwners.find(function(item) { return item.id === sSelectedKey; });
-			var oSelectedOwnerModel = this.getView().getModel("selectedOwnerModel");
+			var oOwner = aOwners.find(function(item) { return item.id === sSelectedKey; }),
+				oSelectedOwnerModel = this.getView().getModel("selectedNewOwnerModel");
 			oSelectedOwnerModel.setData(oOwner);
+		},
+		
+		onChangeOwnerBtnPress: function() {
+			var sFragId;
+			if (!this._changeOwnerDialog) {
+				sFragId = this.createId("idChangeOwnerDialogFrag");
+				this._changeOwnerDialog = sap.ui.xmlfragment(sFragId, "car.lease.CarLeaseDemo.fragments.ChangeVehicleOwner", this);
+				this.getView().addDependent(this._changeOwnerDialog);
+			}
+			//this._changeOwnerDialog.setModel(this.getView().getModel("DeferCodeModel"));
+			this._changeOwnerDialog.open();
+		},
+		
+		onDetailPress: function(oEvent) {
+			var oSelectedItem = oEvent.getSource().getSelectedItem(),
+				sSelectedVehicleId = oSelectedItem.getCells()[0].getProperty("text");
+				
+			if (sSelectedVehicleId) {
+				var oSelectedVehicleModel = this.getView().getModel("selectedVehicleModel"),
+					oModel = this.getView().byId("CarLeaseWorklistTable").getModel(),
+					aVehicles = oModel.getData().vehicles;
+				
+				var oSelectedVehicle = aVehicles.find(function(item) { return item.v5cID === sSelectedVehicleId });
+				oSelectedVehicleModel.setData(oSelectedVehicle);
+			}
+		},
+		
+		onChangeVehicleOwnerDialogCancel: function() {
+			if (this._changeOwnerDialog) {
+				this._changeOwnerDialog.close();
+			}
+		},
+		
+		onChangeVehicleOwnerDialogOK: function() {
+			var oModel = this.getView().getModel("selectedVehicleModel"),
+				data = oModel.getData(),
+				serviceUrl = this.serviceKey.serviceUrl + this.serviceKey.chaincodePath + this.serviceKey.vehicleOwnerPath + data.v5cID,
+				xhr = new XMLHttpRequest(),
+				oSelectedOwnerModel = this.getView().getModel("selectedNewOwnerModel"),
+				that = this;
+
+			var selectedOwnerData = oSelectedOwnerModel.getData();
+			
+			var dataToSend = {
+				"id": data.v5cID, //vehicle id
+				"ownerId2": selectedOwnerData.id //owner id
+			}
+
+			xhr.open("PUT", serviceUrl);
+			xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.setRequestHeader("Authorization", "Bearer " + this.accessToken);
+			xhr.onload = function () {
+				if (xhr.status === 200) {
+					MessageToast.show("Owner has been changed");
+					that.onChangeVehicleOwnerDialogCancel();
+					oModel.setProperty("/", "");
+					oSelectedOwnerModel.setProperty("/", "");
+					that.refreshWorklist();
+				} else {
+					MessageToast.show("Calling the 'Change Owner' API failed");
+				}
+			};
+			xhr.send(JSON.stringify(dataToSend));
 		}
 	});
 });

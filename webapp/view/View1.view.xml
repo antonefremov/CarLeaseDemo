@@ -11,6 +11,7 @@
 							<Toolbar>
 								<ToolbarSpacer/>
 								<Button text="{i18n>newVehicleBtnText}" press="onNewVehicleBtnPress"/>
+								<Button text="{i18n>changeOwnerBtnText}" press="onChangeOwnerBtnPress" enabled="{= !!${selectedVehicleModel>/owner/id}}"/>
 							</Toolbar>
 						</headerToolbar>
 						<columns>
