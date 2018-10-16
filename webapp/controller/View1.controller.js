@@ -16,6 +16,10 @@ sap.ui.define([
 			"vehiclesPath": "vehicles/",
 			"ownersPath": "owners/",
 			"vehicleOwnerPath": "vehicles/owner/v",
+			"serviceUrlJava": "https://carlease-cecal-haematoma.cfapps.eu10.hana.ondemand.com/",
+			"vehiclesPathJava": "carlease/vehicles/",
+			"ownersPathJava": "owners/",
+			"vehicleOwnerPathJava": "carlease/vehicles/owner/v",
 			"oAuth": {
 				"clientId": "sb-34d0015d-0a99-496a-8fcd-e74ea546e694!b5485|na-420adfc9-f96e-4090-a650-0386988b67e0!b1836",
 				"clientSecret": "IUTA1zPBP0ZO2m7k75nqDvAIo6w=",
@@ -33,26 +37,26 @@ sap.ui.define([
 			this.getView().setModel(oExistingOwnersModel, "existingOwnersModel");
 			this.getView().setModel(oSelectedNewOwnerModel, "selectedNewOwnerModel");
 			this.getView().setModel(oSelectedVehicleModel, "selectedVehicleModel");
+			
+			var formData = new FormData(),
+				xhr = new XMLHttpRequest(),
+				serviceUrl = this.serviceKey.serviceUrlJava + this.serviceKey.vehiclesPathJava;
+			xhr.open("GET", serviceUrl);
+			xhr.onload = function () {
+				if (xhr.status === 200) {
+					var data = JSON.parse(xhr.response),
+						oModel = new JSONModel(data);
+					that.getView().byId("CarLeaseWorklistTable").setModel(oModel);
+				}
+			};
+			xhr.send(formData);
+			
 			this.getToken(this.serviceKey.oAuth.url + "/oauth/token?grant_type=client_credentials",
 					this.serviceKey.oAuth.clientId,
 					this.serviceKey.oAuth.clientSecret)
 				.then(
 					function (result) {
-						var formData = new FormData(),
-							xhr = new XMLHttpRequest(),
-							serviceUrl = that.serviceKey.serviceUrl + that.serviceKey.chaincodePath + that.serviceKey.vehiclesPath;
 						that.accessToken = result;
-						xhr.open("GET", serviceUrl);
-						xhr.setRequestHeader("Authorization", "Bearer " + result);
-						xhr.withCredentials = true; // CORS
-						xhr.onload = function () {
-							if (xhr.status === 200) {
-								var data = JSON.parse(xhr.response),
-									oModel = new JSONModel(data);
-								that.getView().byId("CarLeaseWorklistTable").setModel(oModel);
-							}
-						};
-						xhr.send(formData);
 					}
 				);
 		},
@@ -103,7 +107,7 @@ sap.ui.define([
 				"id": selectedOwnerData.id,
 				"username": selectedOwnerData.username,
 				"company": selectedOwnerData.company
-			}
+			};
 
 			var oNewVehicle = {
 				"v5cID": data.v5cID,
@@ -117,7 +121,7 @@ sap.ui.define([
 			var dataToSend = {
 				"id": data.v5cID,
 				"text": JSON.stringify(oNewVehicle)
-			}
+			};
 
 			xhr.open("POST", serviceUrl);
 			xhr.setRequestHeader("Content-Type", "application/json");
@@ -138,11 +142,11 @@ sap.ui.define([
 		getExistingOwners: function () {
 			var formData = new FormData(),
 				xhr = new XMLHttpRequest(),
-				serviceUrl = this.serviceKey.serviceUrl + this.serviceKey.chaincodePath + this.serviceKey.ownersPath,
+				serviceUrl = this.serviceKey.serviceUrlJava + this.serviceKey.ownersPathJava,
 				that = this;
 			xhr.open("GET", serviceUrl);
-			xhr.setRequestHeader("Authorization", "Bearer " + this.accessToken);
-			xhr.withCredentials = true; // CORS
+			// xhr.setRequestHeader("Authorization", "Bearer " + this.accessToken);
+			// xhr.withCredentials = true; // CORS
 			xhr.onload = function () {
 				if (xhr.status === 200) {
 					var data = JSON.parse(xhr.response),
@@ -156,11 +160,11 @@ sap.ui.define([
 		refreshWorklist: function () {
 			var formData = new FormData(),
 				xhr = new XMLHttpRequest(),
-				serviceUrl = this.serviceKey.serviceUrl + this.serviceKey.chaincodePath + this.serviceKey.vehiclesPath,
+				serviceUrl = this.serviceKey.serviceUrlJava + this.serviceKey.vehiclesPathJava,
 				that = this;
 			xhr.open("GET", serviceUrl);
-			xhr.setRequestHeader("Authorization", "Bearer " + this.accessToken);
-			xhr.withCredentials = true; // CORS
+			// xhr.setRequestHeader("Authorization", "Bearer " + this.accessToken);
+			// xhr.withCredentials = true; // CORS
 			xhr.onload = function () {
 				if (xhr.status === 200) {
 					var data = JSON.parse(xhr.response),
@@ -170,20 +174,22 @@ sap.ui.define([
 			};
 			xhr.send(formData);
 		},
-		
-		onOwnerSelected: function(oEvent) {
+
+		onOwnerSelected: function (oEvent) {
 			var oSelect = oEvent.getSource(),
-			sSelectedKey = oSelect.getSelectedKey();
-			
+				sSelectedKey = oSelect.getSelectedKey();
+
 			var oModel = this.getView().getModel("existingOwnersModel"),
 				aOwners = oModel.getData().owners;
-			
-			var oOwner = aOwners.find(function(item) { return item.id === sSelectedKey; }),
+
+			var oOwner = aOwners.find(function (item) {
+					return item.id === sSelectedKey;
+				}),
 				oSelectedOwnerModel = this.getView().getModel("selectedNewOwnerModel");
 			oSelectedOwnerModel.setData(oOwner);
 		},
-		
-		onChangeOwnerBtnPress: function() {
+
+		onChangeOwnerBtnPress: function () {
 			var sFragId;
 			if (!this._changeOwnerDialog) {
 				sFragId = this.createId("idChangeOwnerDialogFrag");
@@ -193,27 +199,29 @@ sap.ui.define([
 			//this._changeOwnerDialog.setModel(this.getView().getModel("DeferCodeModel"));
 			this._changeOwnerDialog.open();
 		},
-		
-		onDetailPress: function(oEvent) {
+
+		onDetailPress: function (oEvent) {
 			var oSelectedItem = oEvent.getSource().getSelectedItem(),
 				sSelectedVehicleId = oSelectedItem.getCells()[0].getProperty("text");
-				
+
 			if (sSelectedVehicleId) {
 				var oSelectedVehicleModel = this.getView().getModel("selectedVehicleModel"),
 					oModel = this.getView().byId("CarLeaseWorklistTable").getModel(),
 					aVehicles = oModel.getData().vehicles;
-				
-				var oSelectedVehicle = aVehicles.find(function(item) { return item.v5cID === sSelectedVehicleId });
+
+				var oSelectedVehicle = aVehicles.find(function (item) {
+					return item.v5cID === sSelectedVehicleId;
+				});
 				oSelectedVehicleModel.setData(oSelectedVehicle);
 			}
 		},
-		
-		onChangeVehicleOwnerDialogCancel: function() {
+
+		onChangeVehicleOwnerDialogCancel: function () {
 			if (this._changeOwnerDialog) {
 				this._changeOwnerDialog.close();
 			}
 		},
-		
+
 		onChangeVehicleOwnerDialogOK: function() {
 			var oModel = this.getView().getModel("selectedVehicleModel"),
 				data = oModel.getData(),
@@ -227,7 +235,7 @@ sap.ui.define([
 			var dataToSend = {
 				"id": data.v5cID, //vehicle id
 				"ownerId2": selectedOwnerData.id //owner id
-			}
+			};
 
 			xhr.open("PUT", serviceUrl);
 			xhr.setRequestHeader("Content-Type", "application/json");
